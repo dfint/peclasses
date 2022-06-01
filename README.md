@@ -1,6 +1,6 @@
 # PECLASSES
 
-This is intended to be fast minimalistic library for Portable Executable file parsing.
+This is intended to be a fast minimalistic library for Portable Executable file parsing.
 
 Also it contains `AnnotatedStructure` base class which allows to declare 
 [ctypes structures](https://docs.python.org/3/library/ctypes.html#structures-and-unions)
