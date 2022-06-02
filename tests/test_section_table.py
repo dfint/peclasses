@@ -1,19 +1,7 @@
-from ctypes import sizeof
-
 import pytest
 
-from peclasses.peclasses import (
-    ImageDosHeader, ImageFileHeader, ImageDataDirectory, DataDirectory, ImageOptionalHeader,
-    SectionTable, Section
-)
-
-
-def test_sizes():
-    assert sizeof(ImageDosHeader) == 64
-    assert sizeof(ImageFileHeader) == 20
-    assert sizeof(DataDirectory) == 8
-    assert sizeof(ImageDataDirectory) == 8 * 16
-    assert sizeof(ImageOptionalHeader) == 224
+from peclasses.pe_classes import Section
+from peclasses.section_table import SectionTable
 
 
 @pytest.fixture
