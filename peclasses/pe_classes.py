@@ -100,7 +100,6 @@ class ImageNTHeaders(AnnotatedStructure):
 
 
 class ImageSectionHeader(AnnotatedStructure):
-    # ImageSectionHeader
     IMAGE_SCN_CNT_CODE = 0x00000020
     IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
     IMAGE_SCN_CNT_UNINITIALIZED_DATA = 0x00000080
