@@ -1,6 +1,7 @@
 # PECLASSES
 
 [![Tests](https://github.com/dfint/peclasses/actions/workflows/tests.yml/badge.svg)](https://github.com/dfint/peclasses/actions/workflows/tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/dfint/peclasses/badge.svg?branch=main)](https://coveralls.io/github/dfint/peclasses?branch=main)
 
 This is intended to be a fast minimalistic library for Portable Executable file parsing.
 
