@@ -1,8 +1,9 @@
 import bisect
+from ctypes import c_uint
 from itertools import zip_longest
 from typing import Sequence, SupportsBytes, Callable, Type, Iterable
 
-from peclasses.pe_classes import Section
+from peclasses.pe_classes import ImageSectionHeader
 from peclasses.type_aliases import Offset, Rva
 from peclasses.utilities import read_structure
 
@@ -23,6 +24,42 @@ class KeySequenceWrapper(Sequence):
 
     def __getitem__(self, i: K) -> V:
         return self.key(self.sequence[i])
+
+
+class Section(ImageSectionHeader):
+    def __init__(
+            self,
+            name: bytes,
+            flags: int,
+            pointer_to_raw_data: int,
+            size_of_raw_data: int,
+            virtual_address: int,
+            virtual_size: int
+    ):
+        super().__init__()
+        self.name = type(self.name)(name)
+        self.characteristics = c_uint(flags)
+        self.pointer_to_raw_data = c_uint(pointer_to_raw_data)
+        self.size_of_raw_data = c_uint(size_of_raw_data)
+        self.virtual_address = c_uint(virtual_address)
+        self.virtual_size = c_uint(virtual_size)
+
+    def offset_to_rva(self, offset: Offset) -> Rva:
+        local_offset = offset - self.pointer_to_raw_data
+        assert 0 <= local_offset < self.size_of_raw_data
+        return local_offset + self.virtual_address
+
+    def rva_to_offset(self, virtual_address: Rva):
+        local_offset = virtual_address - self.virtual_address
+        assert 0 <= local_offset < self.virtual_size
+        return local_offset + self.pointer_to_raw_data
+
+    def __repr__(self):
+        return (
+            f"{self.__class__.__name__}({self.name!r}, flags=0x{self.characteristics:X}, "
+            f"pstart=0x{self.pointer_to_raw_data:X}, psize=0x{self.size_of_raw_data:X}, "
+            f"vstart=0x{self.virtual_address:X}, vsize=0x{self.virtual_size:X})"
+        )
 
 
 class SectionTable(Sequence[Section]):

@@ -1,7 +1,6 @@
 from ctypes import c_char, c_ushort, c_uint, c_ubyte
 
-from peclasses.annotated_structure import AnnotatedStructure
-from peclasses.type_aliases import Offset, Rva
+from peclasses.annotated_structure import AnnotatedStructure, AnnotatedUnion
 
 
 class ImageDosHeader(AnnotatedStructure):
@@ -100,7 +99,7 @@ class ImageNTHeaders(AnnotatedStructure):
     image_optional_header: ImageOptionalHeader
 
 
-class Section(AnnotatedStructure):
+class ImageSectionHeader(AnnotatedStructure):
     # ImageSectionHeader
     IMAGE_SCN_CNT_CODE = 0x00000020
     IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
@@ -111,8 +110,12 @@ class Section(AnnotatedStructure):
     IMAGE_SCN_MEM_READ = 0x40000000
     IMAGE_SCN_MEM_WRITE = 0x80000000
 
+    class _Misc(AnnotatedUnion):
+        physical_address: c_uint
+        virtual_size: c_uint
+
     name: c_char * 8
-    virtual_size: c_uint
+    misc: _Misc
     virtual_address: c_uint
     size_of_raw_data: c_uint
     pointer_to_raw_data: c_uint
@@ -122,36 +125,10 @@ class Section(AnnotatedStructure):
     number_of_linenumbers: c_ushort
     characteristics: c_uint
 
-    def __init__(
-            self,
-            name: bytes,
-            flags: int,
-            pointer_to_raw_data: int,
-            size_of_raw_data: int,
-            virtual_address: int,
-            virtual_size: int
-    ):
-        super().__init__()
-        self.name = type(self.name)(name)
-        self.characteristics = c_uint(flags)
-        self.pointer_to_raw_data = c_uint(pointer_to_raw_data)
-        self.size_of_raw_data = c_uint(size_of_raw_data)
-        self.virtual_address = c_uint(virtual_address)
-        self.virtual_size = c_uint(virtual_size)
+    @property
+    def virtual_size(self):
+        return self.misc.virtual_size
 
-    def offset_to_rva(self, offset: Offset) -> Rva:
-        local_offset = offset - self.pointer_to_raw_data
-        assert 0 <= local_offset < self.size_of_raw_data
-        return local_offset + self.virtual_address
-
-    def rva_to_offset(self, virtual_address: Rva):
-        local_offset = virtual_address - self.virtual_address
-        assert 0 <= local_offset < self.virtual_size
-        return local_offset + self.pointer_to_raw_data
-
-    def __repr__(self):
-        return (
-            f"{self.__class__.__name__}({self.name!r}, flags=0x{self.characteristics:X}, "
-            f"pstart=0x{self.pointer_to_raw_data:X}, psize=0x{self.size_of_raw_data:X}, "
-            f"vstart=0x{self.virtual_address:X}, vsize=0x{self.virtual_size:X})"
-        )
+    @virtual_size.setter
+    def virtual_size(self, value):
+        self.misc.virtual_size = value
