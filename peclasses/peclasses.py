@@ -128,20 +128,22 @@ class Section(AnnotatedStructure):
     number_of_linenumbers: c_ushort
     characteristics: c_uint
 
-    @staticmethod
-    def new(name: bytes, flags: int,
+    def __init__(
+            self,
+            name: bytes,
+            flags: int,
             pointer_to_raw_data: int,
             size_of_raw_data: int,
             virtual_address: int,
-            virtual_size: int):
-        self = Section()
+            virtual_size: int
+    ):
+        super().__init__()
         self.name = type(self.name)(name)
-        self.characteristics = flags
-        self.pointer_to_raw_data = pointer_to_raw_data
-        self.size_of_raw_data = size_of_raw_data
-        self.virtual_address = virtual_address
-        self.virtual_size = virtual_size
-        return self
+        self.characteristics = c_uint(flags)
+        self.pointer_to_raw_data = c_uint(pointer_to_raw_data)
+        self.size_of_raw_data = c_uint(size_of_raw_data)
+        self.virtual_address = c_uint(virtual_address)
+        self.virtual_size = c_uint(virtual_size)
 
     def offset_to_rva(self, offset) -> Rva:
         local_offset = offset - self.pointer_to_raw_data

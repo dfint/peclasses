@@ -19,7 +19,7 @@ def test_sizes():
 @pytest.fixture
 def section_table():
     return SectionTable([
-        Section.new(
+        Section(
             b".text",
             flags=0x60000020,
             pointer_to_raw_data=0x400,
@@ -27,7 +27,7 @@ def section_table():
             virtual_address=0x1000,
             virtual_size=0xAA977F
         ),
-        Section.new(
+        Section(
             b".rdata",
             flags=0x40000040,
             pointer_to_raw_data=0xAA9C00,
@@ -35,7 +35,7 @@ def section_table():
             virtual_address=0xAAB000,
             virtual_size=0x12C802
         ),
-        Section.new(
+        Section(
             b".data",
             flags=0xC0000040,
             pointer_to_raw_data=0xBD6600,
@@ -43,7 +43,7 @@ def section_table():
             virtual_address=0xBD8000,
             virtual_size=0xDFC4A4
         ),
-        Section.new(
+        Section(
             b".rsrc",
             flags=0x40000040,
             pointer_to_raw_data=0xBE0000,
@@ -51,7 +51,7 @@ def section_table():
             virtual_address=0x19D5000,
             virtual_size=0x1630
         ),
-        Section.new(
+        Section(
             b".reloc",
             flags=0x42000040,
             pointer_to_raw_data=0xBE1800,
