@@ -1,7 +1,7 @@
 from ctypes import c_char, c_ushort, c_uint, c_ubyte
 
 from peclasses.annotated_structure import AnnotatedStructure
-from peclasses.type_aliases import Rva
+from peclasses.type_aliases import Offset, Rva
 
 
 class ImageDosHeader(AnnotatedStructure):
@@ -139,17 +139,19 @@ class Section(AnnotatedStructure):
         self.virtual_address = c_uint(virtual_address)
         self.virtual_size = c_uint(virtual_size)
 
-    def offset_to_rva(self, offset) -> Rva:
+    def offset_to_rva(self, offset: Offset) -> Rva:
         local_offset = offset - self.pointer_to_raw_data
         assert 0 <= local_offset < self.size_of_raw_data
         return local_offset + self.virtual_address
 
-    def rva_to_offset(self, virtual_address):
+    def rva_to_offset(self, virtual_address: Rva):
         local_offset = virtual_address - self.virtual_address
         assert 0 <= local_offset < self.virtual_size
         return local_offset + self.pointer_to_raw_data
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.name!r}, flags=0x{self.characteristics:X}, " \
-               f"pstart=0x{self.pointer_to_raw_data:X}, psize=0x{self.size_of_raw_data:X}, " \
-               f"vstart=0x{self.virtual_address:X}, vsize=0x{self.virtual_size:X})"
+        return (
+            f"{self.__class__.__name__}({self.name!r}, flags=0x{self.characteristics:X}, "
+            f"pstart=0x{self.pointer_to_raw_data:X}, psize=0x{self.size_of_raw_data:X}, "
+            f"vstart=0x{self.virtual_address:X}, vsize=0x{self.virtual_size:X})"
+        )
