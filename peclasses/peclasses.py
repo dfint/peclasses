@@ -6,7 +6,7 @@ from typing import (Iterable, MutableMapping, List, Mapping, BinaryIO, Tuple, Se
                     SupportsBytes)
 
 from .type_aliases import Rva
-from .ctypes_annotated_structure import AnnotatedStructure
+from .annotated_structure import AnnotatedStructure
 from .utilities import align, read_structure
 
 
