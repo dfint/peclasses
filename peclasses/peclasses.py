@@ -320,13 +320,13 @@ class PortableExecutable:
         self._relocation_table = None
 
     def rewrite_image_nt_headers(self):
-        offset = self.image_dos_header.e_lfanew
+        offset = self.image_dos_header.e_lfanew.value
         self.file.seek(offset)
         self.image_nt_headers: SupportsBytes
         self.file.write(bytes(self.image_nt_headers))
 
     def rewrite_data_directory(self):
-        offset = self.image_dos_header.e_lfanew + sizeof(ImageNTHeaders) - sizeof(ImageDataDirectory)
+        offset = self.image_dos_header.e_lfanew.value + sizeof(ImageNTHeaders) - sizeof(ImageDataDirectory)
         self.file.seek(offset)
         self.image_data_directory: SupportsBytes
         self.file.write(bytes(self.image_data_directory))
@@ -341,14 +341,14 @@ class PortableExecutable:
     def section_table(self):
         if self._section_table is None:
             n = self.image_file_header.number_of_sections
-            offset = self.image_dos_header.e_lfanew + sizeof(self.image_nt_headers)
+            offset = self.image_dos_header.e_lfanew.value + sizeof(self.image_nt_headers)
             self._section_table = SectionTable.read(self.file, offset, n)
         return self._section_table
 
     @property
     def relocation_table(self) -> RelocationTable:
         if self._relocation_table is None:
-            rva = self.image_data_directory.basereloc.virtual_address
+            rva = self.image_data_directory.basereloc.virtual_address.value
             offset = self.section_table.rva_to_offset(rva)
             size = self.image_data_directory.basereloc.size
             self.file.seek(offset)
@@ -356,7 +356,8 @@ class PortableExecutable:
         return self._relocation_table
 
     def info(self):
-        entry_point = self.image_optional_header.address_of_entry_point + self.image_optional_header.image_base
+        entry_point = (self.image_optional_header.address_of_entry_point.value
+                       + self.image_optional_header.image_base.value)
         return (
             f"DOS signature: {self.image_dos_header.e_magic!r}\n"
             f"e_lfanew: 0x{self.image_dos_header.e_lfanew:x}\n"
