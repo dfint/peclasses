@@ -2,23 +2,12 @@ import bisect
 from array import array
 from ctypes import c_char, c_ushort, c_uint, sizeof, c_ubyte
 from itertools import zip_longest
-from typing import (Iterable, MutableMapping, List, Mapping, BinaryIO, Tuple, Sequence, Optional, Type, TypeVar,
+from typing import (Iterable, MutableMapping, List, Mapping, BinaryIO, Tuple, Sequence, Optional,
                     SupportsBytes)
 
 from .type_aliases import Rva
 from .ctypes_annotated_structure import AnnotatedStructure
-from .utilities import align
-
-TStructure = TypeVar("TStructure")
-
-
-def read_structure(cls: Type[TStructure], file: BinaryIO, offset=None) -> TStructure:
-    if offset is not None:
-        file.seek(offset)
-
-    raw = file.read(sizeof(cls))
-    new_obj = cls.from_buffer_copy(raw)
-    return new_obj
+from .utilities import align, read_structure
 
 
 class ImageDosHeader(AnnotatedStructure):
