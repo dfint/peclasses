@@ -1,5 +1,7 @@
 # PECLASSES
 
+[![Tests](https://github.com/dfint/peclasses/actions/workflows/tests.yml/badge.svg)](https://github.com/dfint/peclasses/actions/workflows/tests.yml)
+
 This is intended to be a fast minimalistic library for Portable Executable file parsing.
 
 Also it contains `AnnotatedStructure` base class which allows to declare 
