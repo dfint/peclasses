@@ -14,10 +14,11 @@ def exe_file():
         format PE GUI
     
         section '.text' code readable executable
+            mov eax, some_string
             ret
     
         section '.data' data readable writable
-            db 0
+            some_string db 'some string', 0
     
         section '.reloc' data readable discardable fixups
         """
@@ -35,21 +36,31 @@ def exe_file():
         yield exe_file_path
 
 
-def test_portable_executable_section_table(exe_file):
-    chars = ImageSectionHeader.Characteristics
+@pytest.fixture
+def portable_executable(exe_file):
     with open(exe_file, "rb") as file:
         pe = PortableExecutable(file)
-        assert [(section.name, section.characteristics) for section in pe.section_table] == [
-            (
-                b'.text',
-                chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE
-            ),
-            (
-                b'.data',
-                chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE
-            ),
-            (
-                b'.reloc',
-                chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE
-            ),
-        ]
+        yield pe
+
+
+def test_portable_executable_section_table(portable_executable):
+    chars = ImageSectionHeader.Characteristics
+    assert [(section.name, section.characteristics) for section in portable_executable.section_table] == [
+        (
+            b'.text',
+            chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE
+        ),
+        (
+            b'.data',
+            chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE
+        ),
+        (
+            b'.reloc',
+            chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE
+        ),
+    ]
+
+
+def test_portable_executable_relocation_table(portable_executable):
+    relocation_table = portable_executable.relocation_table
+    assert len(list(relocation_table)) == 1
