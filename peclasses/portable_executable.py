@@ -19,7 +19,10 @@ class PortableExecutable:
     _section_table: Optional[SectionTable]
     _relocation_table: Optional[RelocationTable]
 
-    def read_file(self, file):
+    def __init__(self, file):
+        self._read_file(file)
+
+    def _read_file(self, file):
         self.file = file
         self.file.seek(0)
         self.image_dos_header = read_structure(ImageDosHeader, file)
@@ -32,6 +35,9 @@ class PortableExecutable:
         self._section_table = None
         self._relocation_table = None
 
+    def reread(self):
+        self._read_file(self.file)
+
     def rewrite_image_nt_headers(self):
         offset = self.image_dos_header.e_lfanew
         write_structure(self.image_nt_headers, self.file, offset)
@@ -39,12 +45,6 @@ class PortableExecutable:
     def rewrite_data_directory(self):
         offset = self.image_dos_header.e_lfanew + sizeof(ImageNTHeaders) - sizeof(ImageDataDirectory)
         write_structure(self.image_data_directory, self.file, offset)
-
-    def reread(self):
-        self.read_file(self.file)
-
-    def __init__(self, file):
-        self.read_file(file)
 
     @property
     def section_table(self):
