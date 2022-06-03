@@ -66,9 +66,10 @@ class PortableExecutable:
 
     def rewrite_data_directory(self):
         data_directory_data = bytes(self.data_directory)[:self.data_directory_size]
-        self.file.seek(self.data_directory_offset())
+        self.file.seek(self.data_directory_offset)
         self.file.write(data_directory_data)
 
+    @property
     def data_directory_offset(self) -> Offset:
         return self.dos_header.e_lfanew + sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray)
 
