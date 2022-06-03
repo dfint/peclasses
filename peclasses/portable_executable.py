@@ -1,5 +1,5 @@
 from ctypes import sizeof
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO, Optional, Union, cast, SupportsBytes
 
 from peclasses.pe_classes import (
     ImageDosHeader, ImageNTHeaders, ImageFileHeader, ImageOptionalHeader, ImageDataDirectoryArray,
@@ -56,26 +56,26 @@ class PortableExecutable:
 
     @property
     def optional_header_offset(self) -> Offset:
-        return self.dos_header.e_lfanew + 4 + sizeof(ImageFileHeader)
+        return cast(int, self.dos_header.e_lfanew) + 4 + sizeof(ImageFileHeader)
 
     def rewrite_nt_headers(self):
         offset = self.dos_header.e_lfanew
-        nt_headers_data = bytes(self.nt_headers)[:self.nt_headers_size]
-        self.file.seek(offset)
+        nt_headers_data = bytes(cast(SupportsBytes, self.nt_headers))[:self.nt_headers_size]
+        self.file.seek(cast(int, offset))
         self.file.write(nt_headers_data)
 
     def rewrite_data_directory(self):
-        data_directory_data = bytes(self.data_directory)[:self.data_directory_size]
+        data_directory_data = bytes(cast(SupportsBytes, self.data_directory))[:self.data_directory_size]
         self.file.seek(self.data_directory_offset)
         self.file.write(data_directory_data)
 
     @property
     def data_directory_offset(self) -> Offset:
-        return self.dos_header.e_lfanew + sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray)
+        return cast(int, self.dos_header.e_lfanew) + sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray)
 
     @property
     def data_directory_size(self) -> int:
-        return sizeof(ImageDataDirectory) * self.optional_header.number_of_rva_and_sizes
+        return sizeof(ImageDataDirectory) * cast(int, self.optional_header.number_of_rva_and_sizes)
 
     @property
     def nt_headers_size(self) -> int:
@@ -84,7 +84,7 @@ class PortableExecutable:
 
     @property
     def section_table_offset(self) -> Offset:
-        return self.dos_header.e_lfanew + self.nt_headers_size
+        return cast(int, self.dos_header.e_lfanew) + self.nt_headers_size
 
     @property
     def section_table(self):
@@ -97,7 +97,7 @@ class PortableExecutable:
     @property
     def relocation_table(self) -> RelocationTable:
         if self._relocation_table is None:
-            rva = self.data_directory.basereloc.virtual_address
+            rva = cast(int, self.data_directory.basereloc.virtual_address)
             offset = self.section_table.rva_to_offset(rva)
             size = self.data_directory.basereloc.size
             self.file.seek(offset)
@@ -109,7 +109,7 @@ class PortableExecutable:
         sections = self.section_table
         section_alignment = self.optional_header.section_alignment
         file_alignment = self.optional_header.file_alignment
-        file_size = align(new_section.pointer_to_raw_data + data_size, file_alignment)
+        file_size = align(cast(int, new_section.pointer_to_raw_data) + data_size, file_alignment)
         new_section.size_of_raw_data = file_size - new_section.pointer_to_raw_data
 
         # Align file size
@@ -129,14 +129,14 @@ class PortableExecutable:
         self.file_header.number_of_sections = len(sections) + 1
         # Fix ImageSize field of the PE header
         self.optional_header.size_of_image = align(
-            new_section.virtual_address + new_section.virtual_size,
+            cast(int, new_section.virtual_address) + new_section.virtual_size,
             section_alignment
         )
         self.rewrite_nt_headers()
 
     def info(self):
-        entry_point = (self.optional_header.address_of_entry_point
-                       + self.optional_header.image_base)
+        entry_point = (cast(int, self.optional_header.address_of_entry_point)
+                       + cast(int, self.optional_header.image_base))
         return (
             f"DOS signature: {self.dos_header.e_magic!r}\n"
             f"e_lfanew: 0x{self.dos_header.e_lfanew:x}\n"
