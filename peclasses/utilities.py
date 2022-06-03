@@ -16,3 +16,10 @@ def read_structure(cls: Type[TStructure], file: BinaryIO, offset=None) -> TStruc
     raw = file.read(sizeof(cls))
     new_obj = cls.from_buffer_copy(raw)
     return new_obj
+
+
+def write_structure(structure: TStructure, file: BinaryIO, offset=None) -> None:
+    if offset is not None:
+        file.seek(offset)
+
+    file.write(structure)

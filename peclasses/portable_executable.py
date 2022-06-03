@@ -1,12 +1,12 @@
 from ctypes import sizeof
-from typing import BinaryIO, Optional, SupportsBytes
+from typing import BinaryIO, Optional
 
 from peclasses.pe_classes import (
     ImageDosHeader, ImageNTHeaders, ImageFileHeader, ImageOptionalHeader, ImageDataDirectory
 )
 from peclasses.relocation_table import RelocationTable
 from peclasses.section_table import SectionTable
-from peclasses.utilities import read_structure
+from peclasses.utilities import read_structure, write_structure
 
 
 class PortableExecutable:
@@ -34,15 +34,11 @@ class PortableExecutable:
 
     def rewrite_image_nt_headers(self):
         offset = self.image_dos_header.e_lfanew
-        self.file.seek(offset)
-        self.image_nt_headers: SupportsBytes
-        self.file.write(bytes(self.image_nt_headers))
+        write_structure(self.image_nt_headers, self.file, offset)
 
     def rewrite_data_directory(self):
         offset = self.image_dos_header.e_lfanew + sizeof(ImageNTHeaders) - sizeof(ImageDataDirectory)
-        self.file.seek(offset)
-        self.image_data_directory: SupportsBytes
-        self.file.write(bytes(self.image_data_directory))
+        write_structure(self.image_data_directory, self.file, offset)
 
     def reread(self):
         self.read_file(self.file)
