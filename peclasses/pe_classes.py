@@ -97,7 +97,7 @@ class ImageOptionalHeader(AnnotatedStructure):
     size_of_heap_commit: c_uint
     loader_flags: c_uint
     number_of_rva_and_sizes: c_uint
-    image_data_directory: ImageDataDirectoryArray
+    data_directory: ImageDataDirectoryArray
 
 
 class ImageNTHeaders(AnnotatedStructure):
@@ -136,7 +136,7 @@ class ImageOptionalHeader64(AnnotatedStructure):
     size_of_heap_commit: c_ulonglong
     loader_flags: c_uint
     number_of_rva_and_sizes: c_uint
-    image_data_directory: ImageDataDirectoryArray
+    data_directory: ImageDataDirectoryArray
 
 
 class ImageNTHeaders64(AnnotatedStructure):

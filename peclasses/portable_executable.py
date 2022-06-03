@@ -47,7 +47,7 @@ class PortableExecutable:
 
         self.file_header = self.nt_headers.file_header
         self.optional_header = self.nt_headers.optional_header
-        self.data_directory = self.optional_header.image_data_directory
+        self.data_directory = self.optional_header.data_directory
         self._section_table = None
         self._relocation_table = None
 
@@ -58,7 +58,7 @@ class PortableExecutable:
     def optional_header_offset(self) -> Offset:
         return self.dos_header.e_lfanew + 4 + sizeof(ImageFileHeader)
 
-    def rewrite_image_nt_headers(self):
+    def rewrite_nt_headers(self):
         offset = self.dos_header.e_lfanew
         nt_headers_data = bytes(self.nt_headers)[:self.nt_headers_size]
         self.file.seek(offset)
@@ -132,7 +132,7 @@ class PortableExecutable:
             new_section.virtual_address + new_section.virtual_size,
             section_alignment
         )
-        self.rewrite_image_nt_headers()
+        self.rewrite_nt_headers()
 
     def info(self):
         entry_point = (self.optional_header.address_of_entry_point
