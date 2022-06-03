@@ -1,6 +1,6 @@
 import bisect
 from ctypes import c_uint
-from typing import Sequence, SupportsBytes, Callable, Type, Iterable
+from typing import Sequence, SupportsBytes, Callable, Type, Iterable, cast
 
 from peclasses.pe_classes import ImageSectionHeader
 from peclasses.type_aliases import Offset, Rva
@@ -43,14 +43,14 @@ class Section(ImageSectionHeader):
         self.virtual_size = c_uint(virtual_size)
 
     def offset_to_rva(self, offset: Offset) -> Rva:
-        local_offset = offset - self.pointer_to_raw_data
-        assert 0 <= local_offset < self.size_of_raw_data
-        return local_offset + self.virtual_address
+        local_offset = offset - cast(int, self.pointer_to_raw_data)
+        assert 0 <= local_offset < cast(int, self.size_of_raw_data)
+        return local_offset + cast(int, self.virtual_address)
 
     def rva_to_offset(self, virtual_address: Rva):
-        local_offset = virtual_address - self.virtual_address
+        local_offset = virtual_address - cast(int, self.virtual_address)
         assert 0 <= local_offset < self.virtual_size
-        return local_offset + self.pointer_to_raw_data
+        return local_offset + cast(int, self.pointer_to_raw_data)
 
     def __repr__(self):
         return (
