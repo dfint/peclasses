@@ -1,11 +1,16 @@
 import os
 import tempfile
+from io import BytesIO
 from pathlib import Path
 
 import pytest
 
 from peclasses.pe_classes import ImageSectionHeader
 from peclasses.portable_executable import PortableExecutable
+from peclasses.section_table import Section
+from peclasses.utilities import align
+
+chars = ImageSectionHeader.Characteristics
 
 
 @pytest.fixture
@@ -33,19 +38,15 @@ def exe_file():
             asm_file.write(asm_code)
         
         os.system(f"fasm {asm_file_path} {exe_file_path}")
-        yield exe_file_path
+        with open(exe_file_path, "rb") as exe_file:
+            exe_file_data = exe_file.read()
+
+        yield BytesIO(exe_file_data)
 
 
-@pytest.fixture
-def portable_executable(exe_file):
-    with open(exe_file, "rb") as file:
-        pe = PortableExecutable(file)
-        yield pe
-
-
-def test_portable_executable_section_table(portable_executable):
-    chars = ImageSectionHeader.Characteristics
-    assert [(section.name, section.characteristics) for section in portable_executable.section_table] == [
+def test_portable_executable_section_table(exe_file):
+    pe = PortableExecutable(exe_file)
+    assert [(section.name, section.characteristics) for section in pe.section_table] == [
         (
             b'.text',
             chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE
@@ -61,6 +62,41 @@ def test_portable_executable_section_table(portable_executable):
     ]
 
 
-def test_portable_executable_relocation_table(portable_executable):
-    relocation_table = portable_executable.relocation_table
+def test_portable_executable_relocation_table(exe_file):
+    pe = PortableExecutable(exe_file)
+    relocation_table = pe.relocation_table
     assert len(list(relocation_table)) == 1
+
+
+def test_add_new_section(exe_file):
+    pe = PortableExecutable(exe_file)
+
+    old_section_count = len(pe.section_table)
+    new_section_name = b'.new'
+    last_section = pe.section_table[-1]
+    virtual_address = align(
+        last_section.virtual_address + last_section.virtual_size,
+        pe.image_optional_header.section_alignment
+    )
+    physical_address = align(
+        last_section.pointer_to_raw_data + last_section.size_of_raw_data,
+        pe.image_optional_header.file_alignment
+    )
+
+    new_section = Section(
+        name=new_section_name,
+        virtual_address=virtual_address,
+        virtual_size=0,  # Will be calculated by add_new_section
+        pointer_to_raw_data=physical_address,
+        size_of_raw_data=0,  # Will be calculated by add_new_section
+        characteristics=0xDEADBEEF
+    )
+
+    data_size = 1024  # 1 KiB
+
+    pe.add_new_section(new_section, data_size)
+    pe.reread()
+
+    assert len(pe.section_table) == old_section_count + 1
+    last_section = pe.section_table[-1]
+    assert last_section.name == new_section_name and last_section.characteristics == 0xDEADBEEF

@@ -5,8 +5,8 @@ from peclasses.pe_classes import (
     ImageDosHeader, ImageNTHeaders, ImageFileHeader, ImageOptionalHeader, ImageDataDirectory
 )
 from peclasses.relocation_table import RelocationTable
-from peclasses.section_table import SectionTable
-from peclasses.utilities import read_structure, write_structure
+from peclasses.section_table import SectionTable, Section
+from peclasses.utilities import read_structure, write_structure, align
 
 
 class PortableExecutable:
@@ -63,6 +63,36 @@ class PortableExecutable:
             self.file.seek(offset)
             self._relocation_table = RelocationTable.from_file(self.file, size)
         return self._relocation_table
+
+    def add_new_section(self, new_section: Section, data_size: int):
+        file = self.file
+        sections = self.section_table
+        section_alignment = self.image_optional_header.section_alignment
+        file_alignment = self.image_optional_header.file_alignment
+        file_size = align(new_section.pointer_to_raw_data + data_size, file_alignment)
+        new_section.size_of_raw_data = file_size - new_section.pointer_to_raw_data
+
+        # Align file size
+        file.truncate(file_size)
+
+        # Set the new section virtual size
+        new_section.virtual_size = data_size
+
+        # Write the new section info
+        write_structure(
+            new_section,
+            file,
+            self.image_dos_header.e_lfanew + sizeof(self.image_nt_headers) + len(sections) * sizeof(Section)
+        )
+
+        # Fix number of sections
+        self.image_file_header.number_of_sections = len(sections) + 1
+        # Fix ImageSize field of the PE header
+        self.image_optional_header.size_of_image = align(
+            new_section.virtual_address + new_section.virtual_size,
+            section_alignment
+        )
+        self.rewrite_image_nt_headers()
 
     def info(self):
         entry_point = (self.image_optional_header.address_of_entry_point
