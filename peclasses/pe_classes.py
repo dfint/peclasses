@@ -1,4 +1,4 @@
-from ctypes import c_char, c_ushort, c_uint, c_ubyte
+from ctypes import c_char, c_ushort, c_uint, c_ubyte, c_ulonglong
 from enum import IntEnum
 
 from peclasses.annotated_structure import AnnotatedStructure, AnnotatedUnion
@@ -36,28 +36,34 @@ class ImageFileHeader(AnnotatedStructure):
     characteristics: c_ushort
 
 
-class DataDirectory(AnnotatedStructure):
+class ImageDataDirectory(AnnotatedStructure):
     virtual_address: c_uint
     size: c_uint
 
 
-class ImageDataDirectory(AnnotatedStructure):
-    export: DataDirectory
-    import_directory: DataDirectory
-    resource: DataDirectory
-    exception: DataDirectory
-    security: DataDirectory
-    basereloc: DataDirectory
-    debug: DataDirectory
-    copyright: DataDirectory
-    globalptr: DataDirectory
-    tls: DataDirectory
-    load_config: DataDirectory
-    bound_import: DataDirectory
-    iat: DataDirectory
-    delay_import: DataDirectory
-    com_descriptor: DataDirectory
-    reserved: DataDirectory
+class ImageDataDirectoryArray(AnnotatedStructure):
+    export: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_EXPORT == 0
+    import_directory: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_IMPORT == 1
+    resource: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_RESOURCE == 2
+    exception: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_EXCEPTION == 3
+    security: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_SECURITY == 4
+    basereloc: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_BASERELOC == 5
+    debug: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_DEBUG == 6
+    architecture: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_ARCHITECTURE == 7
+    globalptr: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_GLOBALPTR == 8
+    tls: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_TLS == 9
+    load_config: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_LOAD_CONFIG == 10
+    bound_import: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_BOUND_IMPORT == 11
+    iat: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_IAT == 12
+    delay_import: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT == 13
+    com_descriptor: ImageDataDirectory  # IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR == 14
+    reserved: ImageDataDirectory
+
+
+class OptionalHeaderVersionMagic(IntEnum):
+    IMAGE_NT_OPTIONAL_HDR32_MAGIC = 0x10b
+    IMAGE_NT_OPTIONAL_HDR64_MAGIC = 0x20b
+    IMAGE_ROM_OPTIONAL_HDR_MAGIC = 0x107
 
 
 class ImageOptionalHeader(AnnotatedStructure):
@@ -91,13 +97,52 @@ class ImageOptionalHeader(AnnotatedStructure):
     size_of_heap_commit: c_uint
     loader_flags: c_uint
     number_of_rva_and_sizes: c_uint
-    image_data_directory: ImageDataDirectory
+    image_data_directory: ImageDataDirectoryArray
 
 
 class ImageNTHeaders(AnnotatedStructure):
     signature: c_char * 4
-    image_file_header: ImageFileHeader
-    image_optional_header: ImageOptionalHeader
+    file_header: ImageFileHeader
+    optional_header: ImageOptionalHeader
+
+
+class ImageOptionalHeader64(AnnotatedStructure):
+    magic: c_ushort
+    major_linker_version: c_ubyte
+    minor_linker_version: c_ubyte
+    size_of_code: c_uint
+    size_of_initialized_data: c_uint
+    size_of_uninitialized_data: c_uint
+    address_of_entry_point: c_uint
+    base_of_code: c_uint
+    image_base: c_ulonglong
+    section_alignment: c_uint
+    file_alignment: c_uint
+    major_operating_system_version: c_ushort
+    minor_operating_system_version: c_ushort
+    major_image_version: c_ushort
+    minor_image_version: c_ushort
+    major_subsystem_version: c_ushort
+    minor_subsystem_version: c_ushort
+    win32_version_value: c_uint
+    size_of_image: c_uint
+    size_of_headers: c_uint
+    check_sum: c_uint
+    subsystem: c_ushort
+    dll_characteristics: c_ushort
+    size_of_stack_reserve: c_ulonglong
+    size_of_stack_commit: c_ulonglong
+    size_of_heap_reserve: c_ulonglong
+    size_of_heap_commit: c_ulonglong
+    loader_flags: c_uint
+    number_of_rva_and_sizes: c_uint
+    image_data_directory: ImageDataDirectoryArray
+
+
+class ImageNTHeaders64(AnnotatedStructure):
+    signature: c_char * 4
+    file_header: ImageFileHeader
+    optional_header: ImageOptionalHeader64
 
 
 class ImageSectionHeader(AnnotatedStructure):

@@ -116,11 +116,11 @@ def test_add_new_section(exe_file):
     last_section = pe.section_table[-1]
     virtual_address = align(
         last_section.virtual_address + last_section.virtual_size,
-        pe.image_optional_header.section_alignment
+        pe.optional_header.section_alignment
     )
     physical_address = align(
         last_section.pointer_to_raw_data + last_section.size_of_raw_data,
-        pe.image_optional_header.file_alignment
+        pe.optional_header.file_alignment
     )
 
     new_section = Section(
