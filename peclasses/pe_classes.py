@@ -1,4 +1,5 @@
 from ctypes import c_char, c_ushort, c_uint, c_ubyte
+from enum import IntEnum
 
 from peclasses.annotated_structure import AnnotatedStructure, AnnotatedUnion
 
@@ -100,14 +101,15 @@ class ImageNTHeaders(AnnotatedStructure):
 
 
 class ImageSectionHeader(AnnotatedStructure):
-    IMAGE_SCN_CNT_CODE = 0x00000020
-    IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
-    IMAGE_SCN_CNT_UNINITIALIZED_DATA = 0x00000080
-    IMAGE_SCN_MEM_DISCARDABLE = 0x02000000
-    IMAGE_SCN_MEM_SHARED = 0x10000000
-    IMAGE_SCN_MEM_EXECUTE = 0x20000000
-    IMAGE_SCN_MEM_READ = 0x40000000
-    IMAGE_SCN_MEM_WRITE = 0x80000000
+    class Characteristics(IntEnum):
+        IMAGE_SCN_CNT_CODE = 0x00000020
+        IMAGE_SCN_CNT_INITIALIZED_DATA = 0x00000040
+        IMAGE_SCN_CNT_UNINITIALIZED_DATA = 0x00000080
+        IMAGE_SCN_MEM_DISCARDABLE = 0x02000000
+        IMAGE_SCN_MEM_SHARED = 0x10000000
+        IMAGE_SCN_MEM_EXECUTE = 0x20000000
+        IMAGE_SCN_MEM_READ = 0x40000000
+        IMAGE_SCN_MEM_WRITE = 0x80000000
 
     class _Misc(AnnotatedUnion):
         physical_address: c_uint

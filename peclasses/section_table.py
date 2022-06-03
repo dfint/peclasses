@@ -30,7 +30,7 @@ class Section(ImageSectionHeader):
     def __init__(
             self,
             name: bytes,
-            flags: int,
+            characteristics: int,
             pointer_to_raw_data: int,
             size_of_raw_data: int,
             virtual_address: int,
@@ -38,7 +38,7 @@ class Section(ImageSectionHeader):
     ):
         super().__init__()
         self.name = type(self.name)(name)
-        self.characteristics = c_uint(flags)
+        self.characteristics = c_uint(characteristics)
         self.pointer_to_raw_data = c_uint(pointer_to_raw_data)
         self.size_of_raw_data = c_uint(size_of_raw_data)
         self.virtual_address = c_uint(virtual_address)

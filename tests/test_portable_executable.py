@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from peclasses.pe_classes import ImageSectionHeader
 from peclasses.portable_executable import PortableExecutable
 
 
@@ -15,7 +16,7 @@ def exe_file():
         section '.text' code readable executable
             ret
     
-        section '.data' readable writable
+        section '.data' data readable writable
             db 0
     
         section '.reloc' data readable discardable fixups
@@ -35,6 +36,20 @@ def exe_file():
 
 
 def test_portable_executable_section_table(exe_file):
+    chars = ImageSectionHeader.Characteristics
     with open(exe_file, "rb") as file:
         pe = PortableExecutable(file)
-        assert [section.name for section in pe.section_table] == [b'.text', b'.data', b'.reloc']
+        assert [(section.name, section.characteristics) for section in pe.section_table] == [
+            (
+                b'.text',
+                chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE
+            ),
+            (
+                b'.data',
+                chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE
+            ),
+            (
+                b'.reloc',
+                chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE
+            ),
+        ]
