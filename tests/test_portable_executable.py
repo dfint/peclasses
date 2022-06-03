@@ -6,29 +6,29 @@ import pytest
 
 from peclasses.portable_executable import PortableExecutable
 
-code = """
-format PE GUI
-
-section '.text' code readable executable
-    ret
-
-section '.data' readable writable
-    db 0
-
-section '.reloc' data readable discardable fixups
-"""
-
 
 @pytest.fixture
 def exe_file():
+    asm_code = """
+        format PE GUI
+    
+        section '.text' code readable executable
+            ret
+    
+        section '.data' readable writable
+            db 0
+    
+        section '.reloc' data readable discardable fixups
+        """
+
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmpdir = Path(tmpdirname)
         
         asm_file_path = tmpdir / "file.asm"
         exe_file_path = tmpdir / "file.exe"
         
-        with open(asm_file_path, "wt") as asm:
-            asm.write(code)
+        with open(asm_file_path, "wt") as asm_file:
+            asm_file.write(asm_code)
         
         os.system(f"fasm {asm_file_path} {exe_file_path}")
         yield exe_file_path
