@@ -35,8 +35,7 @@ class PortableExecutable:
         nt_headers_signature = file.read(4)
         assert nt_headers_signature == b"PE\0\0"
 
-        optional_header_offset = self.dos_header.e_lfanew + 4 + sizeof(ImageFileHeader)
-        file.seek(optional_header_offset)
+        file.seek(self.optional_header_offset)
         optional_header_magic = int.from_bytes(file.read(2), 'little')
 
         if optional_header_magic == OptionalHeaderVersionMagic.IMAGE_NT_OPTIONAL_HDR32_MAGIC:
@@ -55,18 +54,36 @@ class PortableExecutable:
     def reread(self):
         self._read_file(self.file)
 
+    @property
+    def optional_header_offset(self) -> Offset:
+        return self.dos_header.e_lfanew + 4 + sizeof(ImageFileHeader)
+
     def rewrite_image_nt_headers(self):
         offset = self.dos_header.e_lfanew
-        write_structure(self.nt_headers, self.file, offset)
+        nt_headers_data = bytes(self.nt_headers)[:self.nt_headers_size]
+        self.file.seek(offset)
+        self.file.write(nt_headers_data)
 
     def rewrite_data_directory(self):
-        offset = self.dos_header.e_lfanew + sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray)
-        write_structure(self.data_directory, self.file, offset)
+        data_directory_data = bytes(self.data_directory)[:self.data_directory_size]
+        self.file.seek(self.data_directory_offset())
+        self.file.write(data_directory_data)
+
+    def data_directory_offset(self) -> Offset:
+        return self.dos_header.e_lfanew + sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray)
+
+    @property
+    def data_directory_size(self) -> int:
+        return sizeof(ImageDataDirectory) * self.optional_header.number_of_rva_and_sizes
+
+    @property
+    def nt_headers_size(self) -> int:
+        # Real size of the optional_header depends on number_of_rva_and_sizes value
+        return sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray) + self.data_directory_size
 
     @property
     def section_table_offset(self) -> Offset:
-        return (self.dos_header.e_lfanew + sizeof(self.nt_headers) - sizeof(ImageDataDirectoryArray)
-                + sizeof(ImageDataDirectory) * self.optional_header.number_of_rva_and_sizes)
+        return self.dos_header.e_lfanew + self.nt_headers_size
 
     @property
     def section_table(self):
@@ -104,7 +121,7 @@ class PortableExecutable:
         write_structure(
             new_section,
             file,
-            self.dos_header.e_lfanew + sizeof(self.nt_headers) + len(sections) * sizeof(Section)
+            self.section_table_offset + len(sections) * sizeof(Section)
         )
 
         # Fix number of sections
