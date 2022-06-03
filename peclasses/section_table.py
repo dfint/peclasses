@@ -1,6 +1,5 @@
 import bisect
 from ctypes import c_uint
-from itertools import zip_longest
 from typing import Sequence, SupportsBytes, Callable, Type, Iterable
 
 from peclasses.pe_classes import ImageSectionHeader
@@ -103,17 +102,6 @@ class SectionTable(Sequence[Section]):
         else:
             raise ValueError("One of arguments (offset or rva) must be filled")
 
-    def diff(self, other):
-        for left, right in zip_longest(self._sections, other):
-            if left != right:
-                yield left, right
-
-    def __repr__(self) -> str:
-        return "SectionTable([\n\t{}\n])".format(",\n\t".join(repr(x) for x in self._sections))
-
-    def __str__(self) -> str:
-        return "SectionTable([\n\t{}\n])".format(",\n\t".join(str(x) for x in self._sections))
-
     def __getitem__(self, item):
         return self._sections[item]
 
@@ -122,3 +110,6 @@ class SectionTable(Sequence[Section]):
 
     def __iter__(self) -> Iterable[Section]:
         return iter(self._sections)
+
+    def __repr__(self) -> str:
+        return "SectionTable([\n\t{}\n])".format(",\n\t".join(repr(x) for x in self._sections))
