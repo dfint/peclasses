@@ -134,18 +134,3 @@ class PortableExecutable:
             cast(int, new_section.virtual_address) + new_section.virtual_size, section_alignment
         )
         self.rewrite_nt_headers()
-
-    def info(self):
-        entry_point = cast(int, self.optional_header.address_of_entry_point) + cast(
-            int, self.optional_header.image_base
-        )
-        return (
-            f"DOS signature: {self.dos_header.e_magic!r}\n"
-            f"e_lfanew: 0x{self.dos_header.e_lfanew:x}\n"
-            f"PE signature: {self.nt_headers.signature!r}\n"
-            f"Entry point address: 0x{entry_point}\n"
-            f"{self.file_header}\n"
-            f"{self.optional_header}\n"
-            f"{self.data_directory}\n"
-            f"{self.section_table}\n"
-        )
