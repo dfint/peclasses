@@ -2,9 +2,15 @@ from ctypes import sizeof
 from typing import BinaryIO, Optional, Union, cast, SupportsBytes
 
 from peclasses.pe_classes import (
-    ImageDosHeader, ImageNTHeaders, ImageFileHeader, ImageOptionalHeader, ImageDataDirectoryArray,
+    ImageDosHeader,
+    ImageNTHeaders,
+    ImageFileHeader,
+    ImageOptionalHeader,
+    ImageDataDirectoryArray,
     ImageOptionalHeader64,
-    ImageNTHeaders64, OptionalHeaderVersionMagic, ImageDataDirectory
+    ImageNTHeaders64,
+    OptionalHeaderVersionMagic,
+    ImageDataDirectory,
 )
 from peclasses.relocation_table import RelocationTable
 from peclasses.section_table import SectionTable, Section
@@ -36,7 +42,7 @@ class PortableExecutable:
         assert nt_headers_signature == b"PE\0\0"
 
         file.seek(self.optional_header_offset)
-        optional_header_magic = int.from_bytes(file.read(2), 'little')
+        optional_header_magic = int.from_bytes(file.read(2), "little")
 
         if optional_header_magic == OptionalHeaderVersionMagic.IMAGE_NT_OPTIONAL_HDR32_MAGIC:
             self.nt_headers = read_structure(ImageNTHeaders, file, self.dos_header.e_lfanew)
@@ -60,12 +66,12 @@ class PortableExecutable:
 
     def rewrite_nt_headers(self):
         offset = self.dos_header.e_lfanew
-        nt_headers_data = bytes(cast(SupportsBytes, self.nt_headers))[:self.nt_headers_size]
+        nt_headers_data = bytes(cast(SupportsBytes, self.nt_headers))[: self.nt_headers_size]
         self.file.seek(cast(int, offset))
         self.file.write(nt_headers_data)
 
     def rewrite_data_directory(self):
-        data_directory_data = bytes(cast(SupportsBytes, self.data_directory))[:self.data_directory_size]
+        data_directory_data = bytes(cast(SupportsBytes, self.data_directory))[: self.data_directory_size]
         self.file.seek(self.data_directory_offset)
         self.file.write(data_directory_data)
 
@@ -119,24 +125,20 @@ class PortableExecutable:
         new_section.virtual_size = data_size
 
         # Write the new section info
-        write_structure(
-            new_section,
-            file,
-            self.section_table_offset + len(sections) * sizeof(Section)
-        )
+        write_structure(new_section, file, self.section_table_offset + len(sections) * sizeof(Section))
 
         # Fix number of sections
         self.file_header.number_of_sections = len(sections) + 1
         # Fix ImageSize field of the PE header
         self.optional_header.size_of_image = align(
-            cast(int, new_section.virtual_address) + new_section.virtual_size,
-            section_alignment
+            cast(int, new_section.virtual_address) + new_section.virtual_size, section_alignment
         )
         self.rewrite_nt_headers()
 
     def info(self):
-        entry_point = (cast(int, self.optional_header.address_of_entry_point)
-                       + cast(int, self.optional_header.image_base))
+        entry_point = cast(int, self.optional_header.address_of_entry_point) + cast(
+            int, self.optional_header.image_base
+        )
         return (
             f"DOS signature: {self.dos_header.e_magic!r}\n"
             f"e_lfanew: 0x{self.dos_header.e_lfanew:x}\n"

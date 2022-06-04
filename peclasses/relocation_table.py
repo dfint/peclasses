@@ -36,8 +36,8 @@ class RelocationTable:
         while cur_off < reloc_size:
             cur_page = int.from_bytes(file.read(4), "little")
             block_size = int.from_bytes(file.read(4), "little")
-            assert (block_size > 8), block_size
-            assert ((block_size - 8) % 2 == 0)
+            assert block_size > 8, block_size
+            assert (block_size - 8) % 2 == 0
             relocs = array("H")
             relocs.fromfile(file, (block_size - 8) // 2)
             yield cur_page, [x for x in relocs if x >> 12 == RelocationTable.IMAGE_REL_BASED_HIGHLOW]
@@ -54,8 +54,7 @@ class RelocationTable:
 
     def to_file(self, file):
         for page in sorted(self._table):
-            records = [item | RelocationTable.IMAGE_REL_BASED_HIGHLOW << 12
-                       for item in self._table[page]]
+            records = [item | RelocationTable.IMAGE_REL_BASED_HIGHLOW << 12 for item in self._table[page]]
 
             # Padding records:
             if len(records) % 2 == 1:

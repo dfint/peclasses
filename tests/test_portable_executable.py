@@ -69,36 +69,18 @@ def exe64_file():
 def test_portable_executable_section_table(exe_file):
     pe = PortableExecutable(exe_file)
     assert [(section.name, section.characteristics) for section in pe.section_table] == [
-        (
-            b'.text',
-            chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE
-        ),
-        (
-            b'.data',
-            chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE
-        ),
-        (
-            b'.reloc',
-            chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE
-        ),
+        (b".text", chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE),
+        (b".data", chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE),
+        (b".reloc", chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE),
     ]
 
 
 def test_portable_executable_x64_section_table(exe64_file):
     pe = PortableExecutable(exe64_file)
     assert [(section.name, section.characteristics) for section in pe.section_table] == [
-        (
-            b'.text',
-            chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE
-        ),
-        (
-            b'.data',
-            chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE
-        ),
-        (
-            b'.reloc',
-            chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE
-        ),
+        (b".text", chars.IMAGE_SCN_CNT_CODE | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_EXECUTE),
+        (b".data", chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_WRITE),
+        (b".reloc", chars.IMAGE_SCN_CNT_INITIALIZED_DATA | chars.IMAGE_SCN_MEM_READ | chars.IMAGE_SCN_MEM_DISCARDABLE),
     ]
 
 
@@ -112,15 +94,13 @@ def test_add_new_section(exe_file):
     pe = PortableExecutable(exe_file)
 
     old_section_count = len(pe.section_table)
-    new_section_name = b'.new'
+    new_section_name = b".new"
     last_section = pe.section_table[-1]
     virtual_address = align(
-        last_section.virtual_address + last_section.virtual_size,
-        pe.optional_header.section_alignment
+        last_section.virtual_address + last_section.virtual_size, pe.optional_header.section_alignment
     )
     physical_address = align(
-        last_section.pointer_to_raw_data + last_section.size_of_raw_data,
-        pe.optional_header.file_alignment
+        last_section.pointer_to_raw_data + last_section.size_of_raw_data, pe.optional_header.file_alignment
     )
 
     new_section = Section(
@@ -129,7 +109,7 @@ def test_add_new_section(exe_file):
         virtual_size=0,  # Will be calculated by add_new_section
         pointer_to_raw_data=physical_address,
         size_of_raw_data=0,  # Will be calculated by add_new_section
-        characteristics=0xDEADBEEF
+        characteristics=0xDEADBEEF,
     )
 
     data_size = 1024  # 1 KiB

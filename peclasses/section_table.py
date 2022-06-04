@@ -26,13 +26,13 @@ class KeySequenceWrapper(Sequence[TValue]):
 
 class Section(ImageSectionHeader):
     def __init__(
-            self,
-            name: bytes,
-            characteristics: int,
-            pointer_to_raw_data: int,
-            size_of_raw_data: int,
-            virtual_address: int,
-            virtual_size: int
+        self,
+        name: bytes,
+        characteristics: int,
+        pointer_to_raw_data: int,
+        size_of_raw_data: int,
+        virtual_address: int,
+        virtual_size: int,
     ):
         super().__init__()
         self.name = type(self.name)(name)
@@ -68,10 +68,8 @@ class SectionTable(Sequence[Section]):
         self._offset_key = KeySequenceWrapper(self, lambda x: x.pointer_to_raw_data)
         self._rva_key = KeySequenceWrapper(self, lambda x: x.virtual_address)
 
-        assert all(x.virtual_address < self._sections[i + 1].virtual_address
-                   for i, x in enumerate(self._sections[:-1]))
-        assert all(x.pointer_to_raw_data < self._sections[i + 1].pointer_to_raw_data
-                   for i, x in enumerate(self[:-1]))
+        assert all(x.virtual_address < self._sections[i + 1].virtual_address for i, x in enumerate(self._sections[:-1]))
+        assert all(x.pointer_to_raw_data < self._sections[i + 1].pointer_to_raw_data for i, x in enumerate(self[:-1]))
 
     @classmethod
     def read(cls, file, offset, number) -> "SectionTable":
