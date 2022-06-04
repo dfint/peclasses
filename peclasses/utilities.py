@@ -3,7 +3,7 @@ from typing import TypeVar, Type, BinaryIO
 
 
 def align(n, edge=4):
-    return (n+edge-1) & (-edge)
+    return (n + edge - 1) & (-edge)
 
 
 TStructure = TypeVar("TStructure", bound=Structure)

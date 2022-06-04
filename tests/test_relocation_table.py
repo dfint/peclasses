@@ -28,4 +28,4 @@ def test_relocation_to_file():
     table = RelocationTable.build(relocs)
     file = io.BytesIO()
     table.to_file(file)
-    assert len(file.getvalue()) == 4*2 + 2*len(relocs) + 2  # 2 dwords + N words + 1 padding word
+    assert len(file.getvalue()) == 4 * 2 + 2 * len(relocs) + 2  # 2 dwords + N words + 1 padding word
