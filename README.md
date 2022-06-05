@@ -20,4 +20,7 @@ Derived from the [dfrus](https://github.com/dfint/dfrus) project.
 
 - Comparing to **pefile**, **peclasses** is in the early stages of development and may lack some features;
 - pythonic name style may confuse some library users;
-- it's not tested against a variety of real life species of portable executable, and may not be suitable for e.g. malware analysis (at least without some improvements).
+- it's not tested against a variety of real life species of portable executable, and may not be suitable for e.g. malware analysis (at least without some improvements);
+- type annotations with types from ctypes can be somewhat misleading: e.g. a structure field can be annotated as `c_uint`,
+  ctypes will return its value as plain `int`, but typing tools (such as mypy) will complain that you cannot treat this
+  value as `int` (because it's annotated as `c_uint`), so you may need to use [`cast` function from `typing`](https://docs.python.org/3/library/typing.html#typing.cast).
