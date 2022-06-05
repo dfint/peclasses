@@ -1,5 +1,5 @@
 """
-Base classes which allows to declare ctypes structures in the dataclass style, e.g.:
+Base classes which allow to declare ctypes structures in the dataclass style, e.g.:
 
 ```
 from ctypes import c_int
