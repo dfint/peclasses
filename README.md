@@ -19,5 +19,5 @@ Derived from the [dfrus](https://github.com/dfint/dfrus) project.
 ## Cons
 
 - Comparing to **pefile**, **peclasses** is in the early stages of development and may lack some features;
-- pythonic name style may confuse some of the library users;
-- it's not tested against a variety of real life species of portable executable, and may not be suitable for eg. malware analysis (at least without some improvements).
+- pythonic name style may confuse some library users;
+- it's not tested against a variety of real life species of portable executable, and may not be suitable for e.g. malware analysis (at least without some improvements).
