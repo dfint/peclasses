@@ -30,3 +30,15 @@ class POINT(Structure):
 ```
 
 Derived from the [dfrus](https://github.com/dfint/dfrus) project.
+
+## Features
+
+- As is **peclasses** is IDE-friendly, i.e. an IDE will show you hints about fields of structures;
+- it is pythonic, i.e. names of structures and their fields comply to PEP8 rules;
+- ease to add new structures.
+
+## Cons
+
+- Comparing to **pefile**, **peclasses** is in the early stages of development and may lack some features;
+- pythonic name style may confuse some of the library users;
+- it's not tested against a variety of real life species of portable executable, and may not be suitable for eg. malware analysis (at least without some improvements).
