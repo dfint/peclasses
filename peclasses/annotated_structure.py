@@ -1,3 +1,30 @@
+"""
+Base classes which allows to declare ctypes structures in the dataclass style, e.g.:
+
+```
+from ctypes import c_int
+from peclasses.annotated_structure import AnnotatedStructure
+
+
+class POINT(AnnotatedStructure):
+    x: c_int
+    y: c_int
+```
+
+instead of:
+
+```
+from ctypes import Structure, c_int
+
+
+class POINT(Structure):
+     _fields_ = [("x", c_int),
+                 ("y", c_int)]
+```
+
+For real-life examples see pe_classes.py module.
+"""
+
 from ctypes import Structure, Union
 
 
