@@ -2,6 +2,7 @@
 
 [![Tests](https://github.com/dfint/peclasses/actions/workflows/tests.yml/badge.svg)](https://github.com/dfint/peclasses/actions/workflows/tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/dfint/peclasses/badge.svg?branch=main)](https://coveralls.io/github/dfint/peclasses?branch=main)
+[![Maintainability](https://api.codeclimate.com/v1/badges/00cfad0a1f5be602411c/maintainability)](https://codeclimate.com/github/dfint/peclasses/maintainability)
 
 This is intended to be a fast, minimalistic, IDE-friendly library for Portable Executable file parsing.
 
