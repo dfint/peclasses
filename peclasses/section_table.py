@@ -1,6 +1,6 @@
 import bisect
 from ctypes import c_uint
-from typing import Sequence, SupportsBytes, Callable, Type, Iterable, cast
+from typing import Callable, Iterable, Sequence, SupportsBytes, Type, cast
 
 from peclasses.pe_classes import ImageSectionHeader
 from peclasses.type_aliases import Offset, Rva

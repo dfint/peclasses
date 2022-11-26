@@ -1,4 +1,4 @@
-from ctypes import c_char, c_ushort, c_uint, c_ubyte, c_ulonglong
+from ctypes import c_char, c_ubyte, c_uint, c_ulonglong, c_ushort
 from enum import IntEnum
 
 from peclasses.annotated_structure import AnnotatedStructure, AnnotatedUnion

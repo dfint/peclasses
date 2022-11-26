@@ -1,15 +1,15 @@
 from ctypes import sizeof
 
 from peclasses.pe_classes import (
-    ImageDosHeader,
-    ImageFileHeader,
     ImageDataDirectory,
     ImageDataDirectoryArray,
-    ImageOptionalHeader,
-    ImageSectionHeader,
+    ImageDosHeader,
+    ImageFileHeader,
     ImageNTHeaders,
-    ImageOptionalHeader64,
     ImageNTHeaders64,
+    ImageOptionalHeader,
+    ImageOptionalHeader64,
+    ImageSectionHeader,
 )
 
 

@@ -1,21 +1,21 @@
 from ctypes import sizeof
-from typing import BinaryIO, Optional, Union, cast, SupportsBytes
+from typing import BinaryIO, Optional, SupportsBytes, Union, cast
 
 from peclasses.pe_classes import (
-    ImageDosHeader,
-    ImageNTHeaders,
-    ImageFileHeader,
-    ImageOptionalHeader,
-    ImageDataDirectoryArray,
-    ImageOptionalHeader64,
-    ImageNTHeaders64,
-    OptionalHeaderVersionMagic,
     ImageDataDirectory,
+    ImageDataDirectoryArray,
+    ImageDosHeader,
+    ImageFileHeader,
+    ImageNTHeaders,
+    ImageNTHeaders64,
+    ImageOptionalHeader,
+    ImageOptionalHeader64,
+    OptionalHeaderVersionMagic,
 )
 from peclasses.relocation_table import RelocationTable
-from peclasses.section_table import SectionTable, Section
+from peclasses.section_table import Section, SectionTable
 from peclasses.type_aliases import Offset
-from peclasses.utilities import read_structure, write_structure, align
+from peclasses.utilities import align, read_structure, write_structure
 
 
 class PortableExecutable:

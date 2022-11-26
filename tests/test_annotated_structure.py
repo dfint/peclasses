@@ -1,5 +1,5 @@
 import io
-from ctypes import c_int, c_byte, sizeof
+from ctypes import c_byte, c_int, sizeof
 from typing import SupportsBytes, cast
 
 from peclasses.annotated_structure import AnnotatedStructure

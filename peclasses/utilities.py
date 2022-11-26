@@ -1,5 +1,5 @@
 from ctypes import Structure, sizeof
-from typing import TypeVar, Type, BinaryIO
+from typing import BinaryIO, Type, TypeVar
 
 
 def align(n, edge=4):

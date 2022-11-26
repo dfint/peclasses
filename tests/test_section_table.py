@@ -1,6 +1,6 @@
 import pytest
 
-from peclasses.section_table import SectionTable, Section
+from peclasses.section_table import Section, SectionTable
 
 
 @pytest.fixture
