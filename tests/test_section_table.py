@@ -51,19 +51,32 @@ def section_table():
     )
 
 
+def test_which_section_index(section_table):
+    with pytest.raises(ValueError):
+        section_table.which_section_index()
+
+    assert section_table.which_section_index(offset=section_table[0].pointer_to_raw_data - 1) == -1
+    assert section_table.which_section_index(offset=section_table[0].pointer_to_raw_data) == 0
+    assert section_table.which_section_index(offset=section_table[0].pointer_to_raw_data + 1) == 0
+    assert section_table.which_section_index(offset=section_table[1].pointer_to_raw_data) == 1
+
+    assert section_table.which_section_index(rva=section_table[0].virtual_address - 1) == -1
+    assert section_table.which_section_index(rva=section_table[0].virtual_address) == 0
+    assert section_table.which_section_index(rva=section_table[0].virtual_address + 1) == 0
+    assert section_table.which_section_index(rva=section_table[1].virtual_address) == 1
+
+
 def test_which_section(section_table):
     with pytest.raises(ValueError):
         section_table.which_section()
 
-    assert section_table.which_section(offset=section_table[0].pointer_to_raw_data - 1) == -1
-    assert section_table.which_section(offset=section_table[0].pointer_to_raw_data) == 0
-    assert section_table.which_section(offset=section_table[0].pointer_to_raw_data + 1) == 0
-    assert section_table.which_section(offset=section_table[1].pointer_to_raw_data) == 1
+    assert section_table.which_section(offset=section_table[0].pointer_to_raw_data) == section_table[0]
+    assert section_table.which_section(offset=section_table[0].pointer_to_raw_data + 1) == section_table[0]
+    assert section_table.which_section(offset=section_table[1].pointer_to_raw_data) == section_table[1]
 
-    assert section_table.which_section(rva=section_table[0].virtual_address - 1) == -1
-    assert section_table.which_section(rva=section_table[0].virtual_address) == 0
-    assert section_table.which_section(rva=section_table[0].virtual_address + 1) == 0
-    assert section_table.which_section(rva=section_table[1].virtual_address) == 1
+    assert section_table.which_section(rva=section_table[0].virtual_address) == section_table[0]
+    assert section_table.which_section(rva=section_table[0].virtual_address + 1) == section_table[0]
+    assert section_table.which_section(rva=section_table[1].virtual_address) == section_table[1]
 
 
 def test_rva_to_offset(section_table):

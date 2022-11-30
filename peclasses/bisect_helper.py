@@ -1,6 +1,6 @@
 from typing import Sequence, Callable, TypeVar
 
-TValue = TypeVar["TValue"]
+TValue = TypeVar("TValue")
 
 
 class KeySequenceWrapper(Sequence[TValue]):
