@@ -1,8 +1,7 @@
-import bisect
 from ctypes import c_uint
 from typing import Iterable, Sequence, cast, Optional, BinaryIO
 
-from peclasses.bisect_helper import KeySequenceWrapper
+from peclasses.bisect_helper import Bisector
 from peclasses.pe_classes import ImageSectionHeader
 from peclasses.type_aliases import Offset, Rva
 from peclasses.utilities import read_structure
@@ -52,15 +51,15 @@ class Section(ImageSectionHeader):
 
 class SectionTable(Sequence[Section]):
     _sections: Sequence[Section]
-    _offset_key: KeySequenceWrapper[Section]
-    _rva_key: KeySequenceWrapper[Section]
+    _offset_bisector: Bisector[Section]
+    _rva_bisector: Bisector[Section]
 
     def __init__(self, sections: Sequence[Section]):
         self._sections = sections
 
         # Make auxiliary objects to perform bisection search among physical offsets and rvas:
-        self._offset_key = KeySequenceWrapper(self, lambda x: x.pointer_to_raw_data)
-        self._rva_key = KeySequenceWrapper(self, lambda x: x.virtual_address)
+        self._offset_bisector = Bisector(self._sections, lambda x: x.pointer_to_raw_data)
+        self._rva_bisector = Bisector(self._sections, lambda x: x.virtual_address)
 
         assert all(x.virtual_address < self._sections[i + 1].virtual_address for i, x in enumerate(self._sections[:-1]))
         assert all(x.pointer_to_raw_data < self._sections[i + 1].pointer_to_raw_data for i, x in enumerate(self[:-1]))
@@ -108,9 +107,9 @@ class SectionTable(Sequence[Section]):
         Returns a section index to which belongs given offset or rva
         """
         if offset is not None:
-            return bisect.bisect(self._offset_key, offset) - 1
+            return self._offset_bisector.bisect(offset) - 1
         elif rva is not None:
-            return bisect.bisect(self._rva_key, rva) - 1
+            return self._rva_bisector.bisect(rva) - 1
         else:
             raise ValueError("One of arguments (offset or rva) must be filled")
 
