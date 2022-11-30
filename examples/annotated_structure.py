@@ -1,6 +1,5 @@
 #!/env/bin python3
-
-from ctypes import *
+from ctypes import c_float, c_int
 
 from peclasses.annotated_structure import AnnotatedStructure
 
