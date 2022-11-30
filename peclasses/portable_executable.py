@@ -31,13 +31,13 @@ class PortableExecutable:
     def __init__(self, file):
         self._read_file(file)
 
-    def _read_file(self, file):
+    def _read_file(self, file: BinaryIO) -> None:
         self.file = file
         self.file.seek(0)
         self.dos_header = read_structure(ImageDosHeader, file)
         assert self.dos_header.e_magic == b"MZ"
 
-        file.seek(self.dos_header.e_lfanew)
+        file.seek(cast(int, self.dos_header.e_lfanew))
         nt_headers_signature = file.read(4)
         assert nt_headers_signature == b"PE\0\0"
 
@@ -93,7 +93,7 @@ class PortableExecutable:
         return cast(int, self.dos_header.e_lfanew) + self.nt_headers_size
 
     @property
-    def section_table(self):
+    def section_table(self) -> SectionTable:
         if self._section_table is None:
             n = self.file_header.number_of_sections
             offset = self.section_table_offset
@@ -110,7 +110,7 @@ class PortableExecutable:
             self._relocation_table = RelocationTable.from_file(self.file, size)
         return self._relocation_table
 
-    def add_new_section(self, new_section: Section, data_size: int):
+    def add_new_section(self, new_section: Section, data_size: int) -> None:
         file = self.file
         sections = self.section_table
         section_alignment = self.optional_header.section_alignment

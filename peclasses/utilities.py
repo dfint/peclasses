@@ -1,5 +1,5 @@
 from ctypes import Structure, sizeof
-from typing import BinaryIO, Type, TypeVar
+from typing import BinaryIO, Type, TypeVar, cast
 
 
 def align(n, edge=4):
@@ -22,4 +22,4 @@ def write_structure(structure: TStructure, file: BinaryIO, offset=None) -> None:
     if offset is not None:
         file.seek(offset)
 
-    file.write(structure)
+    file.write(cast(bytes, structure))
