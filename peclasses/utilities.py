@@ -1,5 +1,5 @@
 from ctypes import Structure, sizeof
-from typing import BinaryIO, Type, TypeVar, cast, Optional
+from typing import BinaryIO, Optional, Type, TypeVar, cast
 
 from peclasses.type_aliases import Offset
 

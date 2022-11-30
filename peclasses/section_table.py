@@ -1,5 +1,5 @@
 from ctypes import c_uint
-from typing import Sequence, cast, Optional, BinaryIO, Iterator
+from typing import BinaryIO, Iterator, Optional, Sequence, cast
 
 from peclasses.bisect_helper import Bisector
 from peclasses.pe_classes import ImageSectionHeader

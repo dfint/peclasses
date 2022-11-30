@@ -1,6 +1,6 @@
 import bisect
 from array import array
-from typing import BinaryIO, Iterable, List, Mapping, MutableMapping, Tuple, Iterator
+from typing import BinaryIO, Iterable, Iterator, List, Mapping, MutableMapping, Tuple
 
 from peclasses.utilities import align
 
