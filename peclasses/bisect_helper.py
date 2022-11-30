@@ -1,6 +1,6 @@
 import bisect
 import sys
-from typing import Callable, Generic, Sequence, TypeVar
+from typing import Callable, Generic, Sequence, TypeVar, overload
 
 TValue = TypeVar("TValue")
 
@@ -16,8 +16,16 @@ class _KeySequenceWrapper(Sequence[TValue]):
     def __len__(self) -> int:
         return len(self.sequence)
 
-    def __getitem__(self, i: int) -> int:
-        return self.key(self.sequence[i])
+    @overload
+    def __getitem__(self, i: int) -> TValue:
+        ...
+
+    @overload
+    def __getitem__(self, s: slice) -> Sequence[TValue]:
+        ...
+
+    def __getitem__(self, arg):
+        return self.key(self.sequence[arg])
 
 
 class Bisector(Generic[TValue]):
@@ -32,8 +40,6 @@ class Bisector(Generic[TValue]):
         def bisect_right(self, x: int) -> int:
             return bisect.bisect_right(self._sequence, x, key=self._key)
 
-        bisect = bisect_right
-
         def bisect_left(self, x: int) -> int:
             return bisect.bisect_left(self._sequence, x, key=self._key)
 
@@ -46,7 +52,7 @@ class Bisector(Generic[TValue]):
         def bisect_right(self, x: int) -> int:
             return bisect.bisect_right(self._wrapper, x)
 
-        bisect = bisect_right
-
         def bisect_left(self, x: int) -> int:
             return bisect.bisect_left(self._wrapper, x)
+
+    bisect = bisect_right

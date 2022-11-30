@@ -1,5 +1,5 @@
 from ctypes import c_uint
-from typing import BinaryIO, Iterator, Optional, Sequence, cast
+from typing import BinaryIO, Iterator, Optional, Sequence, cast, overload
 
 from peclasses.bisect_helper import Bisector
 from peclasses.pe_classes import ImageSectionHeader
@@ -61,8 +61,15 @@ class SectionTable(Sequence[Section]):
         self._offset_bisector = Bisector(self._sections, lambda x: cast(int, x.pointer_to_raw_data))
         self._rva_bisector = Bisector(self._sections, lambda x: cast(int, x.virtual_address))
 
-        assert all(x.virtual_address < self._sections[i + 1].virtual_address for i, x in enumerate(self._sections[:-1]))
-        assert all(x.pointer_to_raw_data < self._sections[i + 1].pointer_to_raw_data for i, x in enumerate(self[:-1]))
+        assert all(
+            cast(int, x.virtual_address) < cast(int, self._sections[i + 1].virtual_address)
+            for i, x in enumerate(self._sections[:-1])
+        )
+
+        assert all(
+            cast(int, x.pointer_to_raw_data) < cast(int, self._sections[i + 1].pointer_to_raw_data)
+            for i, x in enumerate(self._sections[:-1])
+        )
 
     @classmethod
     def read(cls, file: BinaryIO, offset: Offset, number: int) -> "SectionTable":
@@ -113,8 +120,16 @@ class SectionTable(Sequence[Section]):
         else:
             raise ValueError("One of arguments (offset or rva) must be filled")
 
-    def __getitem__(self, item):
-        return self._sections[item]
+    @overload
+    def __getitem__(self, i: int) -> Section:
+        ...
+
+    @overload
+    def __getitem__(self, s: slice) -> Sequence[Section]:
+        ...
+
+    def __getitem__(self, arg):
+        return self._sections[arg]
 
     def __len__(self) -> int:
         return len(self._sections)
