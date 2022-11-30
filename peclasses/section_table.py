@@ -1,27 +1,11 @@
 import bisect
 from ctypes import c_uint
-from typing import Callable, Iterable, Sequence, SupportsBytes, Type, cast
+from typing import Iterable, Sequence, SupportsBytes, cast
 
+from peclasses.bisect_helper import KeySequenceWrapper
 from peclasses.pe_classes import ImageSectionHeader
 from peclasses.type_aliases import Offset, Rva
 from peclasses.utilities import read_structure
-
-TValue = Type["TValue"]
-
-
-class KeySequenceWrapper(Sequence[TValue]):
-    sequence: Sequence[TValue]
-    key: Callable[[int], TValue]
-
-    def __init__(self, sequence: Sequence[TValue], key: Callable[[int], TValue]):
-        self.sequence = sequence
-        self.key = key
-
-    def __len__(self) -> int:
-        return len(self.sequence)
-
-    def __getitem__(self, i: int) -> TValue:
-        return self.key(self.sequence[i])
 
 
 class Section(ImageSectionHeader):
@@ -85,14 +69,14 @@ class SectionTable(Sequence[Section]):
             file.write(bytes(section))
 
     def offset_to_rva(self, offset: Offset) -> Rva:
-        i = bisect.bisect(self._offset_key, offset) - 1
+        i = self.which_section(offset=offset)
         return self._sections[i].offset_to_rva(offset)
 
     def rva_to_offset(self, rva: Rva) -> Offset:
-        i = bisect.bisect(self._rva_key, rva) - 1
+        i = self.which_section(rva=rva)
         return self._sections[i].rva_to_offset(rva)
 
-    def which_section(self, offset: Offset = None, rva: Rva = None):
+    def which_section(self, offset: Offset = None, rva: Rva = None) -> int:
         if offset is not None:
             return bisect.bisect(self._offset_key, offset) - 1
         elif rva is not None:
