@@ -14,13 +14,13 @@ if sys.version_info[0:2] >= (3, 10):
             self._sequence = sequence
             self._key = key
 
-        def bisect_right(self, x: int, *args, **kwargs) -> int:
-            return bisect.bisect_right(self._sequence, x, *args, **kwargs, key=self._key)
+        def bisect_right(self, x: int) -> int:
+            return bisect.bisect_right(self._sequence, x, key=self._key)
 
         bisect = bisect_right
 
-        def bisect_left(self, x: int, *args, **kwargs) -> int:
-            return bisect.bisect_left(self._sequence, x, *args, **kwargs, key=self._key)
+        def bisect_left(self, x: int) -> int:
+            return bisect.bisect_left(self._sequence, x, key=self._key)
 else:
     class _KeySequenceWrapper(Sequence[TValue]):
         sequence: Sequence[TValue]
@@ -43,10 +43,10 @@ else:
         def __init__(self, sequence: Sequence[TValue], key: Callable[[TValue], int]):
             self._wrapper = _KeySequenceWrapper(sequence, key)
 
-        def bisect_right(self, x: int, *args, **kwargs) -> int:
-            return bisect.bisect_right(self._wrapper, x, *args, **kwargs)
+        def bisect_right(self, x: int) -> int:
+            return bisect.bisect_right(self._wrapper, x)
 
         bisect = bisect_right
 
-        def bisect_left(self, x: int, *args, **kwargs) -> int:
-            return bisect.bisect_left(self._wrapper, x, *args, **kwargs)
+        def bisect_left(self, x: int) -> int:
+            return bisect.bisect_left(self._wrapper, x)

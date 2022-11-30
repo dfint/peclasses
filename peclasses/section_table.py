@@ -1,5 +1,5 @@
 from ctypes import c_uint
-from typing import Iterable, Sequence, cast, Optional, BinaryIO
+from typing import Sequence, cast, Optional, BinaryIO, Iterator
 
 from peclasses.bisect_helper import Bisector
 from peclasses.pe_classes import ImageSectionHeader
@@ -33,7 +33,7 @@ class Section(ImageSectionHeader):
         assert 0 <= local_offset < cast(int, self.size_of_raw_data)
         return local_offset + cast(int, self.virtual_address)
 
-    def rva_to_offset(self, virtual_address: Rva):
+    def rva_to_offset(self, virtual_address: Rva) -> Offset:
         """
         Converts given rva within current section to a physical offset
         """
@@ -41,7 +41,7 @@ class Section(ImageSectionHeader):
         assert 0 <= local_offset < self.virtual_size
         return local_offset + cast(int, self.pointer_to_raw_data)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}({self.name!r}, flags=0x{self.characteristics:X}, "
             f"pstart=0x{self.pointer_to_raw_data:X}, psize=0x{self.size_of_raw_data:X}, "
@@ -58,8 +58,8 @@ class SectionTable(Sequence[Section]):
         self._sections = sections
 
         # Make auxiliary objects to perform bisection search among physical offsets and rvas:
-        self._offset_bisector = Bisector(self._sections, lambda x: x.pointer_to_raw_data)
-        self._rva_bisector = Bisector(self._sections, lambda x: x.virtual_address)
+        self._offset_bisector = Bisector(self._sections, lambda x: cast(int, x.pointer_to_raw_data))
+        self._rva_bisector = Bisector(self._sections, lambda x: cast(int, x.virtual_address))
 
         assert all(x.virtual_address < self._sections[i + 1].virtual_address for i, x in enumerate(self._sections[:-1]))
         assert all(x.pointer_to_raw_data < self._sections[i + 1].pointer_to_raw_data for i, x in enumerate(self[:-1]))
@@ -119,7 +119,7 @@ class SectionTable(Sequence[Section]):
     def __len__(self) -> int:
         return len(self._sections)
 
-    def __iter__(self) -> Iterable[Section]:
+    def __iter__(self) -> Iterator[Section]:
         return iter(self._sections)
 
     def __repr__(self) -> str:

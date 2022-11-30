@@ -28,7 +28,7 @@ class PortableExecutable:
     _section_table: Optional[SectionTable]
     _relocation_table: Optional[RelocationTable]
 
-    def __init__(self, file):
+    def __init__(self, file: BinaryIO):
         self._read_file(file)
 
     def _read_file(self, file: BinaryIO) -> None:
@@ -43,11 +43,12 @@ class PortableExecutable:
 
         file.seek(self.optional_header_offset)
         optional_header_magic = int.from_bytes(file.read(2), "little")
+        nt_headers_offset = cast(int, self.dos_header.e_lfanew)
 
         if optional_header_magic == OptionalHeaderVersionMagic.IMAGE_NT_OPTIONAL_HDR32_MAGIC:
-            self.nt_headers = read_structure(ImageNTHeaders, file, self.dos_header.e_lfanew)
+            self.nt_headers = read_structure(ImageNTHeaders, file, nt_headers_offset)
         elif optional_header_magic == OptionalHeaderVersionMagic.IMAGE_NT_OPTIONAL_HDR64_MAGIC:
-            self.nt_headers = read_structure(ImageNTHeaders64, file, self.dos_header.e_lfanew)
+            self.nt_headers = read_structure(ImageNTHeaders64, file, nt_headers_offset)
         else:
             raise ValueError(f"Optional header magic 0x{optional_header_magic:X} is not supported")
 
@@ -57,20 +58,20 @@ class PortableExecutable:
         self._section_table = None
         self._relocation_table = None
 
-    def reread(self):
+    def reread(self) -> None:
         self._read_file(self.file)
 
     @property
     def optional_header_offset(self) -> Offset:
         return cast(int, self.dos_header.e_lfanew) + 4 + sizeof(ImageFileHeader)
 
-    def rewrite_nt_headers(self):
+    def rewrite_nt_headers(self) -> None:
         offset = self.dos_header.e_lfanew
         nt_headers_data = bytes(cast(SupportsBytes, self.nt_headers))[: self.nt_headers_size]
         self.file.seek(cast(int, offset))
         self.file.write(nt_headers_data)
 
-    def rewrite_data_directory(self):
+    def rewrite_data_directory(self) -> None:
         data_directory_data = bytes(cast(SupportsBytes, self.data_directory))[: self.data_directory_size]
         self.file.seek(self.data_directory_offset)
         self.file.write(data_directory_data)
@@ -95,7 +96,7 @@ class PortableExecutable:
     @property
     def section_table(self) -> SectionTable:
         if self._section_table is None:
-            n = self.file_header.number_of_sections
+            n = cast(int, self.file_header.number_of_sections)
             offset = self.section_table_offset
             self._section_table = SectionTable.read(self.file, offset, n)
         return self._section_table
@@ -105,7 +106,7 @@ class PortableExecutable:
         if self._relocation_table is None:
             rva = cast(int, self.data_directory.basereloc.virtual_address)
             offset = self.section_table.rva_to_offset(rva)
-            size = self.data_directory.basereloc.size
+            size = cast(int, self.data_directory.basereloc.size)
             self.file.seek(offset)
             self._relocation_table = RelocationTable.from_file(self.file, size)
         return self._relocation_table
@@ -113,10 +114,10 @@ class PortableExecutable:
     def add_new_section(self, new_section: Section, data_size: int) -> None:
         file = self.file
         sections = self.section_table
-        section_alignment = self.optional_header.section_alignment
-        file_alignment = self.optional_header.file_alignment
+        section_alignment = cast(int, self.optional_header.section_alignment)
+        file_alignment = cast(int, self.optional_header.file_alignment)
         file_size = align(cast(int, new_section.pointer_to_raw_data) + data_size, file_alignment)
-        new_section.size_of_raw_data = file_size - new_section.pointer_to_raw_data
+        new_section.size_of_raw_data = file_size - cast(int, new_section.pointer_to_raw_data)
 
         # Align file size
         file.truncate(file_size)

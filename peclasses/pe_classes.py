@@ -1,7 +1,9 @@
 from ctypes import c_char, c_ubyte, c_uint, c_ulonglong, c_ushort
 from enum import IntEnum
+from typing import cast
 
 from peclasses.annotated_structure import AnnotatedStructure, AnnotatedUnion
+from peclasses.type_aliases import Rva
 
 
 class ImageDosHeader(AnnotatedStructure):
@@ -172,9 +174,9 @@ class ImageSectionHeader(AnnotatedStructure):
     characteristics: c_uint
 
     @property
-    def virtual_size(self):
-        return self.misc.virtual_size
+    def virtual_size(self) -> Rva:
+        return cast(Rva, self.misc.virtual_size)
 
     @virtual_size.setter
-    def virtual_size(self, value):
+    def virtual_size(self, value: Rva) -> None:
         self.misc.virtual_size = value
