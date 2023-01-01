@@ -37,11 +37,8 @@ class Bisector(Generic[TValue]):
             self._sequence = sequence
             self._key = key
 
-        def bisect_right(self, x: int) -> int:
-            return bisect.bisect_right(self._sequence, x, key=self._key)
-
-        def bisect_left(self, x: int) -> int:
-            return bisect.bisect_left(self._sequence, x, key=self._key)
+        def bisect(self, x: int) -> int:
+            return bisect.bisect(self._sequence, x, key=self._key)
 
     else:
         _wrapper: _KeySequenceWrapper[TValue]
@@ -49,10 +46,5 @@ class Bisector(Generic[TValue]):
         def __init__(self, sequence: Sequence[TValue], key: Callable[[TValue], int]):
             self._wrapper = _KeySequenceWrapper(sequence, key)
 
-        def bisect_right(self, x: int) -> int:
-            return bisect.bisect_right(self._wrapper, x)
-
-        def bisect_left(self, x: int) -> int:
-            return bisect.bisect_left(self._wrapper, x)
-
-    bisect = bisect_right
+        def bisect(self, x: int) -> int:
+            return bisect.bisect(self._wrapper, x)
