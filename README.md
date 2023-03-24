@@ -9,7 +9,20 @@ This is intended to be a fast, minimalistic, IDE-friendly library for Portable E
 Also, it contains [`AnnotatedStructure` and `AnnotatedUnion`](https://github.com/dfint/peclasses/blob/main/peclasses/annotated_structure.py) base classes which allow to declare 
 [ctypes structures](https://docs.python.org/3/library/ctypes.html#structures-and-unions) in the [dataclass](https://docs.python.org/3/library/dataclasses.html) style.
 
-See examples of `AnnotatedStructure` usage here: [examples/annotated_structure.py](https://github.com/dfint/peclasses/examples/annotated_structure.py)
+For example, you can write:
+```
+class POINT(AnnotatedStructure):
+    x: c_int
+    y: c_int
+```
+instead of 
+```
+class POINT(Structure):
+    _fields_ = [("x", c_int),
+                ("y", c_int)]
+```
+
+More examples of `AnnotatedStructure` usage see here: [examples/annotated_structure.py](https://github.com/dfint/peclasses/blob/main/examples/annotated_structure.py)
 
 Derived from the [dfrus](https://github.com/dfint/dfrus) project.
 
