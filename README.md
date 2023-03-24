@@ -10,13 +10,13 @@ Also, it contains [`AnnotatedStructure` and `AnnotatedUnion`](https://github.com
 [ctypes structures](https://docs.python.org/3/library/ctypes.html#structures-and-unions) in the [dataclass](https://docs.python.org/3/library/dataclasses.html) style.
 
 For example, you can write:
-```
+```python
 class POINT(AnnotatedStructure):
     x: c_int
     y: c_int
 ```
 instead of 
-```
+```python
 class POINT(Structure):
     _fields_ = [("x", c_int),
                 ("y", c_int)]
