@@ -8,7 +8,7 @@ authors = ["insolor <insolor@gmail.com>"]
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
-pytest = "^8.2.1"
+pytest = "^8.2.2"
 pytest-cov = "^5.0.0"
 flake8 = "^5.0.4"
 black = "^24.4.2"
