@@ -9,9 +9,8 @@ updates:
         patterns:
           - "pytest*"
           - "flake8*"
-          - "black"
-          - "isort"
           - "mypy"
+          - "ruff"
 
   - package-ecosystem: "github-actions"
     directory: "/"

@@ -17,12 +17,10 @@ class _KeySequenceWrapper(Sequence[TValue]):
         return len(self.sequence)
 
     @overload
-    def __getitem__(self, i: int) -> TValue:
-        ...
+    def __getitem__(self, i: int) -> TValue: ...
 
     @overload
-    def __getitem__(self, s: slice) -> Sequence[TValue]:
-        ...
+    def __getitem__(self, s: slice) -> Sequence[TValue]: ...
 
     def __getitem__(self, arg):
         return self.key(self.sequence[arg])

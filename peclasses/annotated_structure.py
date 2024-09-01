@@ -51,5 +51,4 @@ class AnnotatedUnionMetaclass(type(Union)):
         return super().__new__(mcs, name, bases, namespace, **kwargs)
 
 
-class AnnotatedUnion(Union, metaclass=AnnotatedUnionMetaclass):
-    ...
+class AnnotatedUnion(Union, metaclass=AnnotatedUnionMetaclass): ...

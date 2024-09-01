@@ -121,12 +121,10 @@ class SectionTable(Sequence[Section]):
             raise ValueError("One of arguments (offset or rva) must be filled")
 
     @overload
-    def __getitem__(self, i: int) -> Section:
-        ...
+    def __getitem__(self, i: int) -> Section: ...
 
     @overload
-    def __getitem__(self, s: slice) -> Sequence[Section]:
-        ...
+    def __getitem__(self, s: slice) -> Sequence[Section]: ...
 
     def __getitem__(self, arg):
         return self._sections[arg]
