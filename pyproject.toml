@@ -6,7 +6,7 @@ authors = ["insolor <insolor@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-ruff = "^0.8.4"
+ruff = "^0.9.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^8.3.4"
